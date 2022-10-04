@@ -22,9 +22,9 @@ fake_dataset = [
 
 
 class node:
-    def __init__(self, item):
+    def __init__(self, item, count=1):
         self.item = item
-        self.count = 1
+        self.count = count
         self.parent = None
         self.children = list()
 
@@ -66,19 +66,18 @@ def reorder(dataset, weights):
         transaction.sort(key=lambda x: weights[x], reverse=True)
 
 
-def create_tree(dataset):
-    root = node(None)
+def create_tree(dataset, root=node(None), count=1):
     pre_node = root
     for transaction in dataset:
         for item in transaction:
             for c in pre_node.children:
                 if item == c.item:
-                    c.count += 1
+                    c.count += count
                     pre_node = c
                     break
             else:  # new node
                 print("new node:", item, "parent:", pre_node.item)
-                current_node = node(item)
+                current_node = node(item, count)
                 current_node.parent = pre_node
                 pre_node.children.append(current_node)
                 pre_node = current_node
@@ -89,14 +88,10 @@ def create_tree(dataset):
                 # else:
                 #     header_table[item] = [current_node]
         pre_node = root
-        print("============================")
+        print("========================================================")
         show_tree(root)  # current tree after insert one transaction
-        print("============================")
+        print("========================================================")
 
-    # print("@@@FP tree@@@")
-    # show_tree(root)  # final tree
-    # print("@@@header table@@@")
-    # show_header_table(header_table)  # final header table
     return root
 
 
@@ -113,19 +108,19 @@ def create_header_table(node, header_table=dict()):
 
 
 def find_path(header_table, target):
-    path_list = list()
+    path_dict = dict()
     for k, v in header_table.items():
         if k == target:
             for node in v:
                 path = list()
                 parent = node.parent
                 while parent.item != None:  # get parent
-                    path.append([parent.item, node.count])
+                    path.append(parent.item)
                     parent = parent.parent
                 path.reverse()
                 if len(path) != 0:  # first child of root
-                    path_list.append(path)
-            return path_list
+                    path_dict[tuple(path)] = node.count
+            return path_dict
 
     # if node.item != None and node.item == target:  # skip root node
     #     path = list()
@@ -141,38 +136,39 @@ def find_path(header_table, target):
     # return path_list
 
 
-def mine_tree(path_list, min_sup, freq_itemset):
+def mine_tree(path_dict):
     # path_list EX:
     # [
     #   [['bread', 2], ['milk', 2]]
     #   [['bread', 2]]
     #   [['milk', 2]]
     # ]
-    temp_foo_dataset = list()
-    final_foo_dataset= list()
-    for path in path_list:
-        for p in path:
-            temp_foo_dataset.extend([p[0]]*p[1])
-        final_foo_dataset.append(temp_foo_dataset.copy())
-        temp_foo_dataset.clear()
-    
 
-    for i in final_foo_dataset:
-        print(i)
+    # temp_foo_dataset = list()
+    # final_foo_dataset= list()
+    # for path in path_list:
+    #     for p in path:
+    #         temp_foo_dataset.extend([p[0]]*p[1])
+    #     final_foo_dataset.append(temp_foo_dataset.copy())
+    #     temp_foo_dataset.clear()
 
-    weights = first_scan(final_foo_dataset)
-    print(weights)
-    print("before ordering:", final_foo_dataset)
-    reorder(final_foo_dataset, weights)
-    print("after ordering:", final_foo_dataset)
+    # for i in final_foo_dataset:
+    #     print(i)
 
-    root = create_tree(final_foo_dataset)
-    print("@@@FP tree@@@")
+    # sort dict by value
+    combination_dataset, counts = zip(*[(dict[0], dict[1])
+                                      for dict in sorted(path_dict.items(), key=lambda x:x[1], reverse=True)])
+    print("@@@combination_dataset@@@", combination_dataset)
+    print("@@@counts@@@", counts)
+
+    root = node(None)
+    for transaction, count in zip(combination_dataset, counts):
+        root = create_tree([transaction], root=root, count=count)
+    print("@@@Combination FP tree@@@")
     show_tree(root)
-    header_table = create_header_table(root)
-    print("@@@header table@@@")
-    show_header_table(header_table)
-        
+    # header_table = create_header_table(root, dict())
+    # print("@@@Combination header table@@@")
+    # show_header_table(header_table)
 
 
 def show_tree(node):
@@ -198,15 +194,18 @@ if __name__ == "__main__":
     print("after ordering:", fake_dataset)
 
     root = create_tree(fake_dataset)
-    # print("@@@FP tree@@@")
-    # show_tree(root)
+    print("@@@FP tree@@@")
+    show_tree(root)
 
     header_table = create_header_table(root)
-    # print("@@@header table@@@")
-    # show_header_table(header_table)
+    print("@@@header table@@@")
+    show_header_table(header_table)
 
-    freq_itemset = list()
-    min_sup = 2
-    for i in find_path(header_table, "egg"):
-        print(i)
-    mine_tree(find_path(header_table, "egg"), min_sup, freq_itemset)
+    # freq_itemset = list()
+    # min_sup = 2
+    print("@@@path@@@")
+    path_dict = find_path(header_table, "c")
+    for k, v in path_dict.items():
+        print(k, v)
+    if len(path_dict)>0:
+        mine_tree(path_dict)
