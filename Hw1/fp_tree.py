@@ -1,5 +1,3 @@
-from itertools import combinations
-
 # fake_dataset = [
 #     ["f", "c", "a", "m", "p"],
 #     ["f", "c", "a", "b", "m"],
@@ -45,11 +43,10 @@ def load_data(filename):
                 dataset.append(temp_item.copy())
                 temp_item.clear()
             temp_item.append(item[2])
-    # for i in dataset:
-    #     print(i)
     return dataset
 
 
+# 掃描全dataset一次，統計每個item出現的次數
 def first_scan(dataset):
     weights = dict()
     for transaction in dataset:
@@ -61,11 +58,14 @@ def first_scan(dataset):
     return weights
 
 
-def reorder(dataset, weights):
-    for transaction in dataset:
-        transaction.sort(key=lambda x: weights[x], reverse=True)
+# 排序transaction內的item，並刪除小於最小最小支持度的item
+def reorder(dataset, weights, min_sup):
+    for tid in range(len(dataset)):
+        dataset[tid] = [item for item in dataset[tid] if weights[item] >= min_sup]
+        dataset[tid].sort(key=lambda x: weights[x], reverse=True)
 
 
+# 建立FP tree，傳root代表update tree
 def create_tree(dataset, root=node(None), count=1):
     pre_node = root
     for transaction in dataset:
@@ -81,20 +81,14 @@ def create_tree(dataset, root=node(None), count=1):
                 current_node.parent = pre_node
                 pre_node.children.append(current_node)
                 pre_node = current_node
-
-                # create header table link
-                # if header_table.get(item):
-                #     header_table[item].append(current_node)
-                # else:
-                #     header_table[item] = [current_node]
         pre_node = root
         print("========================================================")
         show_tree(root)  # current tree after insert one transaction
         print("========================================================")
-
     return root
 
 
+# header_table key=item, value=list of node
 def create_header_table(node, header_table=dict()):
     if node.item != None:  # skip root node
         # create header table link
@@ -107,6 +101,7 @@ def create_header_table(node, header_table=dict()):
     return header_table
 
 
+# 用header_table的list找所有的parent path
 def find_path(header_table, target):
     path_dict = dict()
     for k, v in header_table.items():
@@ -122,39 +117,9 @@ def find_path(header_table, target):
                     path_dict[tuple(path)] = node.count
             return path_dict
 
-    # if node.item != None and node.item == target:  # skip root node
-    #     path = list()
-    #     parent = node.parent
-    #     while parent.item != None: # get parent
-    #         path.append([parent.item, node.count])
-    #         parent = parent.parent
-    #     path.reverse()
-    #     path_list.append(path)
-    #     return path_list
-    # for c in node.children:
-    #     path_list = find_path(c, target, path_list)
-    # return path_list
 
-
+# 建立combination tree
 def mine_tree(path_dict):
-    # path_list EX:
-    # [
-    #   [['bread', 2], ['milk', 2]]
-    #   [['bread', 2]]
-    #   [['milk', 2]]
-    # ]
-
-    # temp_foo_dataset = list()
-    # final_foo_dataset= list()
-    # for path in path_list:
-    #     for p in path:
-    #         temp_foo_dataset.extend([p[0]]*p[1])
-    #     final_foo_dataset.append(temp_foo_dataset.copy())
-    #     temp_foo_dataset.clear()
-
-    # for i in final_foo_dataset:
-    #     print(i)
-
     # sort dict by value
     combination_dataset, counts = zip(*[(dict[0], dict[1])
                                       for dict in sorted(path_dict.items(), key=lambda x:x[1], reverse=True)])
@@ -166,9 +131,49 @@ def mine_tree(path_dict):
         root = create_tree([transaction], root=root, count=count)
     print("@@@Combination FP tree@@@")
     show_tree(root)
-    # header_table = create_header_table(root, dict())
-    # print("@@@Combination header table@@@")
-    # show_header_table(header_table)
+    return root
+
+
+def del_bad_node(node, min_sup):
+    if node.item != None:  # skip root node
+        pass
+    for c in node.children[::-1]:
+        if c.count < min_sup:
+            node.children.remove(c)
+        else:
+            del_bad_node(c, min_sup)
+
+
+def find_freq_item_set(node, freq_item_set, foo_dict):
+    # if node.item==None or node.parent.item==None:
+    #     print("清空", node.item)
+    #     freq_item_set = dict()
+    new_freq_item_set = freq_item_set.copy()
+    for c in node.children:
+        if c.parent.item == None:
+            print("清空")
+            new_freq_item_set = dict()
+        print("不選", c.item, ", parent", c.parent.item)
+        find_freq_item_set(c, new_freq_item_set, foo_dict)
+        print("選", c.item, c.parent.item)
+        print("有前", new_freq_item_set)
+        if new_freq_item_set.get(c.item):
+            new_freq_item_set[c.item] += c.count
+        else:
+            new_freq_item_set[c.item] = c.count
+        print("有後", new_freq_item_set)
+        find_freq_item_set(c, new_freq_item_set, foo_dict)
+        print("freq_item_set", new_freq_item_set)
+
+        s = frozenset()
+        temp_min = 999
+        for k, v in new_freq_item_set.items():
+            s = s.union(frozenset((k,)))
+            v = min(temp_min, v)
+        if foo_dict.get(s):
+            foo_dict[s] += v
+        else:
+            foo_dict[s] = v
 
 
 def show_tree(node):
@@ -185,12 +190,14 @@ def show_header_table(header_table):
             print(id(node))
 
 
-if __name__ == "__main__":
-    # dataset = load_data("gen/output.txt")
+def fp_growth(input_data, *args):
+    min_sup = args[0].min_sup
+    min_conf = args[0].min_conf
+    fake_dataset = input_data
     weights = first_scan(fake_dataset)
     print(weights)
     print("before ordering:", fake_dataset)
-    reorder(fake_dataset, weights)
+    reorder(fake_dataset, weights, min_sup)
     print("after ordering:", fake_dataset)
 
     root = create_tree(fake_dataset)
@@ -202,10 +209,23 @@ if __name__ == "__main__":
     show_header_table(header_table)
 
     # freq_itemset = list()
-    # min_sup = 2
     print("@@@path@@@")
-    path_dict = find_path(header_table, "c")
-    for k, v in path_dict.items():
-        print(k, v)
-    if len(path_dict)>0:
-        mine_tree(path_dict)
+    ans = list()
+    for header in header_table:
+        path_dict = find_path(header_table, header)
+        for k, v in path_dict.items():
+            print(k, v)
+        if len(path_dict)>0:
+            root = mine_tree(path_dict)
+            del_bad_node(root, min_sup)
+            print("@@@after remove bad node@@@")
+            show_tree(root)
+            
+            foo = dict()
+            foo_dict = dict()
+            find_freq_item_set(root, foo, foo_dict)
+            print("@@@我到底在幹嘛阿@@@")
+            for k, v in foo_dict.items():
+                ans.append([str(set(k.union(frozenset((header,))))), v, "conf", "wtf"])
+                print(ans[-1])
+    return ans
