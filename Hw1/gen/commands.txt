@@ -1,3 +1,3 @@
 cd "C:\Users\Jacky\Desktop\data mining\gen"
 "gen.exe" lit -help
-"gen.exe" lit -ntrans 1 -tlen 1 -nitems 1 -fname output
+"gen.exe" lit -ntrans 0.01 -tlen 5 -nitems 0.01 -fname output
