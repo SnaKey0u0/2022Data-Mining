@@ -101,8 +101,8 @@ def apriori(input_data, args):
     final_list = [list_of_itemset]
     itemset_union(fake_dataset, list_of_itemset, min_sup, final_list)
 
-    # pop 最後一個空集合
-    final_list.pop()
+    # # pop 最後一個空集合
+    # final_list.pop()
 
     print("@@@ final_list @@@")
     for i in final_list:

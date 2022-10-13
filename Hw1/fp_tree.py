@@ -62,15 +62,15 @@ def create_tree(dataset, root=node(None), count=1):
                     pre_node = c
                     break
             else:  # new node
-                print("new node:", item, "parent:", pre_node.item)
+                # print("new node:", item, "parent:", pre_node.item)
                 current_node = node(item, count)
                 current_node.parent = pre_node
                 pre_node.children.append(current_node)
                 pre_node = current_node
         pre_node = root
-        print("========================================================")
-        show_tree(root)  # current tree after insert one transaction
-        print("========================================================")
+        # print("========================================================")
+        # show_tree(root)  # current tree after insert one transaction
+        # print("========================================================")
     return root
 
 
@@ -134,20 +134,20 @@ def find_freq_item_set(node, freq_item_set, foo_dict):
     # if node.item==None or node.parent.item==None:
     #     print("清空", node.item)
     #     freq_item_set = dict()
-    new_freq_item_set = freq_item_set.copy()
     for c in node.children:
+        new_freq_item_set = freq_item_set.copy()
         if c.parent.item == None:
-            print("清空")
+            # print("清空")
             new_freq_item_set = dict()
-        print("不選", c.item, ", parent", c.parent.item)
+        # print("不選", c.item, ", parent", c.parent.item)
         find_freq_item_set(c, new_freq_item_set, foo_dict)
-        print("選", c.item, c.parent.item)
-        print("有前", new_freq_item_set)
+        # print("選", c.item, c.parent.item)
+        # print("有前", new_freq_item_set)
         if new_freq_item_set.get(c.item):
             new_freq_item_set[c.item] += c.count
         else:
             new_freq_item_set[c.item] = c.count
-        print("有後", new_freq_item_set)
+        # print("有後", new_freq_item_set)
         find_freq_item_set(c, new_freq_item_set, foo_dict)
         print("freq_item_set", new_freq_item_set)
 
@@ -199,6 +199,7 @@ def fp_growth(input_data, args):
     print("@@@path@@@")
     final_list = list()
     for header in header_table:
+        print("target", header)
         tmp = list()
         path_dict = find_path(header_table, header)
         for k, v in path_dict.items():
@@ -214,8 +215,8 @@ def fp_growth(input_data, args):
             print("@@@我到底在幹嘛阿@@@")
             for k, v in foo_dict.items():
                 if v >= min_sup:
+                    print("hi",header, k, v)
                     tmp.append([k.union(frozenset((header,))), v])
-                    print(tmp[-1])
         if len(tmp) > 0:  # 避免掉空陣列
             final_list.append(tmp.copy())
 
