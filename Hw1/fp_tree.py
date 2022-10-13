@@ -5,8 +5,6 @@
 #     ["c", "b", "p"],
 #     ["f", "c", "a", "m", "p"]
 # ]
-
-
 class node:
     def __init__(self, item, count=1):
         self.item = item
@@ -183,22 +181,11 @@ def fp_growth(input_data, args):
     min_conf = args.min_conf
     fake_dataset = input_data
 
-    # fake_dataset = [
-    #     ["milk", "bread", "beer"],
-    #     ["bread", "coffee"],
-    #     ["bread", "egg"],
-    #     ["milk", "bread", "coffee"],
-    #     ["milk", "egg"],
-    #     ["bread", "egg"],
-    #     ["milk", "egg"],
-    #     ["milk", "bread", "egg", "beer"],
-    #     ["milk", "bread", "egg"],
-    # ]
     weights = first_scan(fake_dataset)
     print(weights)
     print("before ordering:", fake_dataset)
     reorder(fake_dataset, weights, min_sup)
-    print("after ordering:", fake_dataset) 
+    print("after ordering:", fake_dataset)
 
     root = create_tree(fake_dataset)
     print("@@@FP tree@@@")
@@ -210,27 +197,48 @@ def fp_growth(input_data, args):
 
     # freq_itemset = list()
     print("@@@path@@@")
-    ans = list()
+    final_list = list()
     for header in header_table:
+        tmp = list()
         path_dict = find_path(header_table, header)
         for k, v in path_dict.items():
             print(k, v)
-        if len(path_dict)>0:
+        if len(path_dict) > 0:
             root = mine_tree(path_dict)
-            del_bad_node(root, min_sup)
-            print("@@@after remove bad node@@@")
-            show_tree(root)
-            
+            # del_bad_node(root, min_sup)
+            # print("@@@after remove bad node@@@")
+            # show_tree(root)
             foo = dict()
             foo_dict = dict()
             find_freq_item_set(root, foo, foo_dict)
             print("@@@我到底在幹嘛阿@@@")
             for k, v in foo_dict.items():
-                ans.append([str(set(k.union(frozenset((header,))))), v, "conf", "wtf"])
-                print(ans[-1])
-    
-    for item_1, sup in weights.items():
-        if sup >= min_sup:
-            ans.append([set((item_1,)), sup, "conf", "wtf"])
-            print(ans[-1])
+                if v >= min_sup:
+                    tmp.append([k.union(frozenset((header,))), v])
+                    print(tmp[-1])
+        if len(tmp) > 0:  # 避免掉空陣列
+            final_list.append(tmp.copy())
+
+    # 加入one item set
+    tmp = list()
+    for k, v in weights.items():
+        if v >= min_sup:
+            tmp.append([frozenset((k,)), v])
+    final_list.append(tmp.copy())
+
+    for i in final_list:
+        for j in i:
+            print(j)
+
+    ans = list()
+    print("@@@ confidence @@@")
+    for i in range(len(final_list)):
+        for j in range(i+1, len(final_list)):
+            for x in final_list[i]:
+                for y in final_list[j]:
+                    conf = y[1]/x[1]
+                    if x[0].issubset(y[0]) and min_conf <= conf:
+                        ans.append([str(set(x[0])).replace(',', '')+"=>"+str(set(y[0]-x[0])
+                                                                             ).replace(',', ''), "support=???", format(conf, '.3f'), "wtf"])
+                        print(ans[-1])
     return ans
