@@ -92,9 +92,9 @@ def itemset_union(dataset, list_of_itemset, min_sup, final_list):
     itemset_union(dataset, temp, min_sup, final_list)
 
 
-def apriori(input_data, *args):
-    min_sup = args[0].min_sup
-    min_conf = args[0].min_conf
+def apriori(input_data, args):
+    min_sup = args.min_sup
+    min_conf = args.min_conf
     fake_dataset = input_data
     list_of_itemset = create_one_freq_itemset(fake_dataset, min_sup)
     print("first:", list_of_itemset)
@@ -117,6 +117,6 @@ def apriori(input_data, *args):
                 for y in final_list[j]:
                     conf = y[1]/x[1]
                     if x[0].issubset(y[0]) and min_conf <= conf:
-                        ans.append([str(set(x[0]))+"=>"+str(set(y[0]-x[0])), "support=???", format(conf, '.3f'), "wtf"])
+                        ans.append([str(set(x[0])).replace(',','')+"=>"+str(set(y[0]-x[0])).replace(',',''), "support=???", format(conf, '.3f'), "wtf"])
                         print(ans[-1])
     return ans

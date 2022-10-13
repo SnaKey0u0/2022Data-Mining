@@ -6,18 +6,6 @@
 #     ["f", "c", "a", "m", "p"]
 # ]
 
-fake_dataset = [
-    ["milk", "bread", "beer"],
-    ["bread", "coffee"],
-    ["bread", "egg"],
-    ["milk", "bread", "coffee"],
-    ["milk", "egg"],
-    ["bread", "egg"],
-    ["milk", "egg"],
-    ["milk", "bread", "egg", "beer"],
-    ["milk", "bread", "egg"],
-]
-
 
 class node:
     def __init__(self, item, count=1):
@@ -190,15 +178,27 @@ def show_header_table(header_table):
             print(id(node))
 
 
-def fp_growth(input_data, *args):
-    min_sup = args[0].min_sup
-    min_conf = args[0].min_conf
+def fp_growth(input_data, args):
+    min_sup = args.min_sup
+    min_conf = args.min_conf
     fake_dataset = input_data
+
+    # fake_dataset = [
+    #     ["milk", "bread", "beer"],
+    #     ["bread", "coffee"],
+    #     ["bread", "egg"],
+    #     ["milk", "bread", "coffee"],
+    #     ["milk", "egg"],
+    #     ["bread", "egg"],
+    #     ["milk", "egg"],
+    #     ["milk", "bread", "egg", "beer"],
+    #     ["milk", "bread", "egg"],
+    # ]
     weights = first_scan(fake_dataset)
     print(weights)
     print("before ordering:", fake_dataset)
     reorder(fake_dataset, weights, min_sup)
-    print("after ordering:", fake_dataset)
+    print("after ordering:", fake_dataset) 
 
     root = create_tree(fake_dataset)
     print("@@@FP tree@@@")
@@ -228,4 +228,9 @@ def fp_growth(input_data, *args):
             for k, v in foo_dict.items():
                 ans.append([str(set(k.union(frozenset((header,))))), v, "conf", "wtf"])
                 print(ans[-1])
+    
+    for item_1, sup in weights.items():
+        if sup >= min_sup:
+            ans.append([set((item_1,)), sup, "conf", "wtf"])
+            print(ans[-1])
     return ans
