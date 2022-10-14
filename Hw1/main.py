@@ -50,12 +50,12 @@ def main():
     filename = Path(a.dataset).stem
 
     # TODO: you have to implement this function by yourself
-    apriori_out = apriori(input_data, a)
-    # Write output to file
-    utils.write_file(
-        data=apriori_out,
-        filename=config.OUT_DIR / f"{filename}-apriori.csv"
-    )
+    # apriori_out = apriori(input_data, a)
+    # # Write output to file
+    # utils.write_file(
+    #     data=apriori_out,
+    #     filename=config.OUT_DIR / f"{filename}-apriori.csv"
+    # )
 
     # TODO: you have to implement this function by yourself
     fp_growth_out = fp_growth(input_data, a)
