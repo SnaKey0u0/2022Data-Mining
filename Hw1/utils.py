@@ -64,7 +64,7 @@ def write_file(data: List[List[Any]], filename: Union[str, Path]) -> None:
     """
     with open(filename, 'w') as f:
         writer = csv.writer(f)
-        writer.writerow(["relationship", "support", "confidence", "lift"])
+        writer.writerow(["antecedent", "consequent", "support", "confidence", "lift"])
         writer.writerows(data)
 
 

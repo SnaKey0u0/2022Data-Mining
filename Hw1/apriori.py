@@ -110,13 +110,26 @@ def apriori(input_data, args):
         print(i)
 
     ans = list()
-    print("@@@ confidence @@@")
+    print("@@@ 4層for loop @@@")
     for i in range(len(final_list)):
         for j in range(i+1, len(final_list)):
             for x in final_list[i]:
                 for y in final_list[j]:
-                    conf = y[1]/x[1]
-                    if x[0].issubset(y[0]) and min_conf <= conf:
-                        ans.append([str(set(x[0])).replace(',','')+"=>"+str(set(y[0]-x[0])).replace(',',''), "support=???", format(conf, '.3f'), "wtf"])
+                    x_set, y_set = x[0], y[0]
+                    x_spt, y_spt, z = x[1], y[1], y[0]-x[0]
+                    
+                    conf = y_spt/x_spt
+                    total_trans_len = len(input_data)
+                    if x_set.issubset(y_set) and conf >= min_conf:
+                        for trans in final_list[len(z)-1]:
+                            if z == trans[0]:
+                                z_spt = trans[1]
+                                break
+                        ans.append(
+                            [str(set(x[0])),
+                             str(set(y[0] - x[0])),
+                             format(y_spt / total_trans_len, '.3f'),
+                             format(conf, '.3f'),
+                             format(y_spt/(x_spt*z_spt),'.3f')])
                         print(ans[-1])
     return ans

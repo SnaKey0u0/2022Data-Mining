@@ -109,8 +109,8 @@ def mine_tree(path_dict):
     # sort dict by value
     combination_dataset, counts = zip(*[(dict[0], dict[1])
                                       for dict in sorted(path_dict.items(), key=lambda x:x[1], reverse=True)])
-    print("@@@combination_dataset@@@", combination_dataset)
-    print("@@@counts@@@", counts)
+    # print("@@@combination_dataset@@@", combination_dataset)
+    # print("@@@counts@@@", counts)
 
     root = node(None)
     for transaction, count in zip(combination_dataset, counts):
@@ -199,7 +199,7 @@ def fp_growth(input_data, args):
     print("@@@path@@@")
     final_list = list()
     for header in header_table:
-        print("target", header)
+        print("@@@", header, "的pattern @@@")
         tmp = list()
         path_dict = find_path(header_table, header)
         for k, v in path_dict.items():
@@ -209,37 +209,67 @@ def fp_growth(input_data, args):
             # del_bad_node(root, min_sup)
             # print("@@@after remove bad node@@@")
             # show_tree(root)
+            print("@@@ 選或不選的各種組合 @@@")
             foo = dict()
             foo_dict = dict()
+            # 會順便把找到的組合如{k1:v1, k2:v2} 變成 {frozenset(k1, k2): min(v1,v2)}，存到foo_dict
             find_freq_item_set(root, foo, foo_dict)
-            print("@@@我到底在幹嘛阿@@@")
             for k, v in foo_dict.items():
                 if v >= min_sup:
-                    print("hi",header, k, v)
-                    tmp.append([k.union(frozenset((header,))), v])
+                    tmp.append([k.union(frozenset((header,))), v])  # remove小於min_sup的，然後把自己加進去
         if len(tmp) > 0:  # 避免掉空陣列
-            final_list.append(tmp.copy())
+            final_list.extend(tmp.copy())
 
     # 加入one item set
     tmp = list()
     for k, v in weights.items():
         if v >= min_sup:
             tmp.append([frozenset((k,)), v])
-    final_list.append(tmp.copy())
+    
+    if len(tmp)>0:
+        final_list.extend(tmp.copy())
 
+    print(len(final_list))
+    final_list = sorted(final_list, key=lambda x: len(x[0]))
+
+    trans_len = 1
+    tmp = list()
+    tmp_final_list = list()
+    print("@@@ 相同的key加起來後 @@@")
     for i in final_list:
-        for j in i:
-            print(j)
+        if len(i[0]) == trans_len:
+            tmp.append(i.copy())
+        else:
+            print("tmp",tmp)
+            tmp_final_list.append(tmp.copy())
+            tmp = list()
+            tmp.append(i.copy())
+            trans_len += 1
+    tmp_final_list.append(tmp.copy())
+    final_list = tmp_final_list
+
+    print(final_list)
 
     ans = list()
-    print("@@@ confidence @@@")
+    print("@@@ 4層for loop @@@")
     for i in range(len(final_list)):
         for j in range(i+1, len(final_list)):
             for x in final_list[i]:
                 for y in final_list[j]:
-                    conf = y[1]/x[1]
-                    if x[0].issubset(y[0]) and min_conf <= conf:
-                        ans.append([str(set(x[0])).replace(',', '')+"=>"+str(set(y[0]-x[0])
-                                                                             ).replace(',', ''), "support=???", format(conf, '.3f'), "wtf"])
+                    x_set, y_set = set(x[0]), set(y[0])
+                    x_spt, y_spt, z = x[1], y[1], y[0]-x[0]
+                    conf = y_spt/x_spt
+                    total_trans_len = len(input_data)
+                    if x_set.issubset(y_set) and conf >= min_conf:
+                        for trans in final_list[len(z)-1]:
+                            if z == trans[0]:
+                                z_spt = trans[1]
+                                break
+                        ans.append(
+                            [x_set,
+                             set(z),
+                             format(y_spt / total_trans_len, '.3f'),
+                             format(conf, '.3f'),
+                             format(y_spt/(x_spt*z_spt),'.3f')])
                         print(ans[-1])
     return ans
