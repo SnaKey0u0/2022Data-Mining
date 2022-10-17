@@ -131,22 +131,13 @@ def del_bad_node(node, min_sup):
 
 
 def find_freq_item_set(node, freq_item_set, foo_dict):
-    # if node.item==None or node.parent.item==None:
-    #     print("清空", node.item)
-    #     freq_item_set = dict()
     for c in node.children:
         new_freq_item_set = freq_item_set.copy()
-        if c.parent.item == None:
-            # print("清空")
-            new_freq_item_set = dict()
         # print("不選", c.item, ", parent", c.parent.item)
         find_freq_item_set(c, new_freq_item_set, foo_dict)
         # print("選", c.item, c.parent.item)
         # print("有前", new_freq_item_set)
-        if new_freq_item_set.get(c.item):
-            new_freq_item_set[c.item] += c.count
-        else:
-            new_freq_item_set[c.item] = c.count
+        new_freq_item_set[c.item] = c.count
         # print("有後", new_freq_item_set)
         find_freq_item_set(c, new_freq_item_set, foo_dict)
         print("freq_item_set", new_freq_item_set)
