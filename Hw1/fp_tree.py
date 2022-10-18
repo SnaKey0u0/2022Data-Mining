@@ -202,14 +202,14 @@ def fp_growth(input_data, args):
         print("@@@", header, "的pattern @@@")
         tmp = list()
         path_dict = find_path(header_table, header)
-        for k, v in path_dict.items():
-            print(k, v)
+        # for k, v in path_dict.items():
+        #     print(k, v)
         if len(path_dict) > 0:
             root = mine_tree(path_dict)
             # del_bad_node(root, min_sup)
             # print("@@@after remove bad node@@@")
             # show_tree(root)
-            print("@@@ 選或不選的各種組合 @@@")
+            # print("@@@ 選或不選的各種組合 @@@")
             foo = dict()
             foo_dict = dict()
             # 會順便把找到的組合如{k1:v1, k2:v2} 變成 {frozenset(k1, k2): min(v1,v2)}，存到foo_dict
@@ -229,18 +229,18 @@ def fp_growth(input_data, args):
     if len(tmp)>0:
         final_list.extend(tmp.copy())
 
-    print(len(final_list))
+    # print(len(final_list))
     final_list = sorted(final_list, key=lambda x: len(x[0]))
 
     trans_len = 1
     tmp = list()
     tmp_final_list = list()
-    print("@@@ 相同的key加起來後 @@@")
+    # print("@@@ 相同的key加起來後 @@@")
     for i in final_list:
         if len(i[0]) == trans_len:
             tmp.append(i.copy())
         else:
-            print("tmp",tmp)
+            # print("tmp",tmp)
             tmp_final_list.append(tmp.copy())
             tmp = list()
             tmp.append(i.copy())
@@ -248,10 +248,10 @@ def fp_growth(input_data, args):
     tmp_final_list.append(tmp.copy())
     final_list = tmp_final_list
 
-    print(final_list)
+    # print(final_list)
 
     ans = list()
-    print("@@@ 4層for loop @@@")
+    # print("@@@ 4層for loop @@@")
     for i in range(len(final_list)):
         for j in range(i+1, len(final_list)):
             for x in final_list[i]:
@@ -266,10 +266,10 @@ def fp_growth(input_data, args):
                                 z_spt = trans[1]
                                 break
                         ans.append(
-                            [x_set,
-                             set(z),
+                            [str(set(x_set)).replace(",","").replace("\'",""),
+                             str(set(z)).replace(",","").replace("\'",""),
                              format(y_spt / total_trans_len, '.3f'),
                              format(conf, '.3f'),
-                             format(y_spt/(x_spt*z_spt),'.3f')])
-                        print(ans[-1])
+                             format(y_spt*total_trans_len/(x_spt*z_spt),'.3f')])
+                        # print(ans[-1])
     return ans

@@ -126,10 +126,10 @@ def apriori(input_data, args):
                                 z_spt = trans[1]
                                 break
                         ans.append(
-                            [str(set(x[0])),
-                             str(set(y[0] - x[0])),
+                            [str(set(x_set)).replace(",","").replace("\'",""),
+                             str(set(z)).replace(",","").replace("\'",""),
                              format(y_spt / total_trans_len, '.3f'),
                              format(conf, '.3f'),
-                             format(y_spt/(x_spt*z_spt),'.3f')])
+                             format(y_spt*total_trans_len/(x_spt*z_spt),'.3f')])
                         print(ans[-1])
     return ans
