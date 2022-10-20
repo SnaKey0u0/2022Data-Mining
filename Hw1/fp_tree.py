@@ -1,3 +1,5 @@
+import logging, math
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
 # fake_dataset = [
 #     ["f", "c", "a", "m", "p"],
 #     ["f", "c", "a", "b", "m"],
@@ -136,23 +138,23 @@ def find_freq_item_set(node, freq_item_set, foo_dict):
     #     freq_item_set = dict()
     for c in node.children:
         new_freq_item_set = freq_item_set.copy()
-        if c.parent.item == None:
+        # if c.parent.item == None:
             # print("清空")
-            new_freq_item_set = dict()
+            # new_freq_item_set = dict()
         # print("不選", c.item, ", parent", c.parent.item)
         find_freq_item_set(c, new_freq_item_set, foo_dict)
         # print("選", c.item, c.parent.item)
         # print("有前", new_freq_item_set)
-        if new_freq_item_set.get(c.item):
-            new_freq_item_set[c.item] += c.count
-        else:
-            new_freq_item_set[c.item] = c.count
+        # if new_freq_item_set.get(c.item):
+        #     new_freq_item_set[c.item] += c.count
+        # else:
+        new_freq_item_set[c.item] = c.count
         # print("有後", new_freq_item_set)
         find_freq_item_set(c, new_freq_item_set, foo_dict)
         print("freq_item_set", new_freq_item_set)
 
         s = frozenset()
-        temp_min = 999
+        temp_min = math.inf
         for k, v in new_freq_item_set.items():
             s = s.union(frozenset((k,)))
             v = min(temp_min, v)
@@ -252,11 +254,12 @@ def fp_growth(input_data, args):
 
     ans = list()
     # print("@@@ 4層for loop @@@")
+    logging.info("fp "+str(len(final_list)))
     for i in range(len(final_list)):
         for j in range(i+1, len(final_list)):
             for x in final_list[i]:
                 for y in final_list[j]:
-                    x_set, y_set = set(x[0]), set(y[0])
+                    x_set, y_set = x[0], y[0]
                     x_spt, y_spt, z = x[1], y[1], y[0]-x[0]
                     conf = y_spt/x_spt
                     total_trans_len = len(input_data)

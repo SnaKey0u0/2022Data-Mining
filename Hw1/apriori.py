@@ -1,3 +1,5 @@
+import logging
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
 # fake_dataset = [
 #     ["f", "c", "a", "m", "p"],
 #     ["f", "c", "a", "b", "m"],
@@ -111,6 +113,7 @@ def apriori(input_data, args):
 
     ans = list()
     print("@@@ 4層for loop @@@")
+    logging.info("apr "+str(len(final_list)))
     for i in range(len(final_list)):
         for j in range(i+1, len(final_list)):
             for x in final_list[i]:
