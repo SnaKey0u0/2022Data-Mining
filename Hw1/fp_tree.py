@@ -182,7 +182,7 @@ def fp_growth(input_data, args):
     min_sup = args.min_sup
     min_conf = args.min_conf
     fake_dataset = input_data
-
+    min_sup = min_sup*len(fake_dataset)
     weights = first_scan(fake_dataset)
     print(weights)
     print("before ordering:", fake_dataset)

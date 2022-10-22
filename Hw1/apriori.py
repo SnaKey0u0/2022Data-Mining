@@ -98,6 +98,7 @@ def apriori(input_data, args):
     min_sup = args.min_sup
     min_conf = args.min_conf
     fake_dataset = input_data
+    min_sup = min_sup*len(fake_dataset)
     list_of_itemset = create_one_freq_itemset(fake_dataset, min_sup)
     print("first:", list_of_itemset)
     final_list = [list_of_itemset]
