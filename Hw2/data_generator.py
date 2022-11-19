@@ -101,11 +101,11 @@ class pizza():
 pizzas = list()
 pizzas_test = list()
 
-for i in range(6666):
+for i in range(666):
     my_pizza = pizza()
     pizzas.append(my_pizza)
 
-for i in range(3333):
+for i in range(333):
     my_pizza = pizza()
     pizzas_test.append(my_pizza)
 
