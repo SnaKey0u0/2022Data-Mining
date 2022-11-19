@@ -4,7 +4,7 @@ import csv
 
 class pizza():
     def __init__(self):
-        choice = random.randint(0, 3)
+        choice = random.randint(0, 1)
         if choice == 0:
             self.good_pizza()
         else:
@@ -13,6 +13,7 @@ class pizza():
 
     def good_pizza(self):
         is_add = [True, False]
+        tsai = [0, 1]
         self.high_flour = round(random.uniform(100, 180), 2)
         self.low_flour = round(random.uniform(60, 140), 2)
         self.warm_water = round(random.uniform(100, 180), 2)
@@ -28,7 +29,7 @@ class pizza():
         self.pineapple = random.choices(is_add, weights=[10, 90])[0]
         self.pearl = random.choices(is_add, weights=[10, 90])[0]
         # non-relevent
-        self.elec_power = 1
+        self.elec_power = random.choices(tsai, weights=[5, 95])[0]
         self.cooker_age = random.randint(12, 100)
         self.cooker_gender = random.randint(0, 1)
         # label
@@ -40,6 +41,7 @@ class pizza():
 
     def bad_pizza(self):
         is_add = [True, False]
+        tsai = [0, 1]
         self.high_flour = round(random.uniform(-400, 680), 2)
         # while self.high_flour >= 100 and self.high_flour <= 180:
         #     self.high_flour = round(random.uniform(-400, 680), 2)
@@ -85,7 +87,7 @@ class pizza():
         self.pineapple = random.choices(is_add, weights=[90, 10])[0]
         self.pearl = random.choices(is_add, weights=[90, 10])[0]
         # non-relevent
-        self.elec_power = 0
+        self.elec_power = random.choices(tsai, weights=[95, 5])[0]
         self.cooker_age = random.randint(12, 100)
         self.cooker_gender = random.randint(0, 1)
         # label

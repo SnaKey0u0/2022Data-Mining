@@ -4,7 +4,7 @@ import csv
 
 class pizza():
     def __init__(self):
-        choice = random.randint(0, 3)
+        choice = random.randint(0, 1)
         if choice == 0:
             self.good_pizza()
         else:
@@ -32,7 +32,7 @@ class pizza():
         self.cooker_age = random.randint(18, 100)
         self.cooker_gender = random.randint(0, 1)
         # label
-        mutation = random.randint(0, 99)
+        mutation = random.randint(0, 2)
         if mutation != 0:
             self.label = 1
         else:
@@ -88,7 +88,7 @@ class pizza():
         self.cooker_age = random.randint(18, 100)
         self.cooker_gender = random.randint(0, 1)
         # label
-        mutation = random.randint(0, 99)
+        mutation = random.randint(0, 2)
         if mutation != 0:
             self.label = 0
         else:
@@ -101,11 +101,11 @@ class pizza():
 pizzas = list()
 pizzas_test = list()
 
-for i in range(666):
+for i in range(6666):
     my_pizza = pizza()
     pizzas.append(my_pizza)
 
-for i in range(333):
+for i in range(3333):
     my_pizza = pizza()
     pizzas_test.append(my_pizza)
 
